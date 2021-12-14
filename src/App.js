@@ -64,11 +64,15 @@ function App() {
     // 3. Set the resulting transformation as state using setCharacters
     // 4. You'll know it works if the characters show up on the page
     const data = await resp.json();
-    const newData = data.map((item) => [item.name, (item.dates = `${item.birth} - ${item.death}`)]);
-
+    const newData = data.map((item) => {
+      if (!(item.birth === item.death)) {
+        return [item.name, (item.dates = `${item.birth} - ${item.death}`)];
+      } else {
+        return [item.name, (item.dates = 'Unknown')];
+      }
+    });
     setCharacters(newData);
   };
-
   return (
     <div className="App">
       <BrowserRouter>
