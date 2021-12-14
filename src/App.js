@@ -16,9 +16,10 @@ function App() {
   }, []);
 
   const getFilms = async () => {
-    const resp = await fetch('https://the-one-api.dev/v2/movie/', {
+    const resp = await fetch(`${process.env.REACT_APP_SUPABASE_URL}/rest/v1/films`, {
       headers: {
-        Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+        apikey: process.env.REACT_APP_SUPABASE_KEY,
+        Authorization: `Bearer ${process.env.REACT_APP_SUPABASE_KEY}`,
       },
     });
 
@@ -35,15 +36,19 @@ function App() {
     // 3. Set the resulting transformation as state using setFilms
     // 4. You'll know it works if the films show up on the page
     const data = await resp.json();
-    const newData = data.docs.map((item) => {
-      [item.name, item.name.toLowerCase()];
-    });
+    const newData = data.map((item) => [
+      item.title,
+      item.title.toLowerCase().replace(/ /g, '-'),
+      item.academy_award_nominations,
+      item.box_office_total,
+    ]);
     setFilms(newData);
   };
   const getCharacters = async () => {
-    const resp = await fetch('https://the-one-api.dev/v2/character/', {
+    const resp = await fetch(`${process.env.REACT_APP_SUPABASE_URL}/rest/v1/characters`, {
       headers: {
-        Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+        apikey: process.env.REACT_APP_SUPABASE_KEY,
+        Authorization: `Bearer ${process.env.REACT_APP_SUPABASE_KEY}`,
       },
     });
     // Add your code here!
@@ -59,7 +64,9 @@ function App() {
     // 3. Set the resulting transformation as state using setCharacters
     // 4. You'll know it works if the characters show up on the page
     const data = await resp.json();
-    setCharacters(data.docs);
+    const newData = data.map((item) => [item.name, (item.dates = `${item.birth} - ${item.death}`)]);
+
+    setCharacters(newData);
   };
 
   return (
@@ -76,10 +83,10 @@ function App() {
         {/* ADD YOUR ROUTES HERE */}
         <Switch>
           <Route exact path="/"></Route>
-          <Route path="/films" component={FilmList}>
+          <Route path="/films">
             <FilmList films={films} setFilms={setFilms} />
           </Route>
-          <Route path="/characters" component={CharacterList}>
+          <Route path="/characters">
             <CharacterList characters={characters} setCharacters={setCharacters} />
           </Route>
         </Switch>
